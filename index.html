@@ -3,57 +3,121 @@
 
 <head>
   <meta charset="utf-8">
+  <style>
+  .red{
+    background-color: red;
+  }
+
+  .green{
+    background-color: green;
+  }
+</style>
 </head>
 
-<body>
-  <h2>Todo</h2>
-  <div ng-controller="TodoListController as todoList">
-    <span>{{todoList.remaining()}} of {{todoList.todos.length}} remaining</span>
-    [ <a href="" ng-click="todoList.archive()">archive</a> ]
+<body style="padding-left: 80px;padding-top: 40px;background:url(/images/pic.jpg)">
+  <div style="background-color: rgba(250, 235, 215, 0.8); margin-right: 80px; border-radius: 8px;">
+  <h2 style="padding: 20px;">Todos</h2>
+  <div ng-controller="mainController as todoList" >
     <ul class="unstyled">
-      <li ng-repeat="todo in todoList.todos">
+      <li ng-repeat="todo in People | orderBy: 'deadline'" data-ng-class="getPriorityClass(todo.priority)">
         <label class="checkbox">
           <input type="checkbox" ng-model="todo.done">
-          <span class="done-{{todo.done}}">{{todo.text}}</span>
+          <span class="done-{{todo.done}}">{{todo.deadline | date:"dd/MM/yyyy"}}  ==  {{todo.text}}  ==  {{todo.priority}}</span>
         </label>
       </li>
     </ul>
-    <form ng-submit="todoList.addTodo()">
-      <input type="text" ng-model="todoList.todoText"  size="30"
-             placeholder="add new todo here">
-      <input class="btn-primary" type="submit" value="add">
-    </form>
+  </br>
+    <a class="btn btn-danger fa fa-plus ng-scope" data-toggle="modal" href="" ng-click="openPopupScreen()">Add cool ToDo item</a>
   </div>
+</div>
 
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
-  <script>angular.module('todoApp', [])
-    .controller('TodoListController', function() {
-      var todoList = this;
-      todoList.todos = [
-        {text:'learn angular', done:true},
-        {text:'build an angular app', done:false}];
+  <script data-require="ui-bootstrap@*" data-semver="0.10.0" src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.10.0.js"></script>
+  <script>
+var App = angular.module('todoApp', ['ui.bootstrap'])
 
-      todoList.addTodo = function() {
-        todoList.todos.push({text:todoList.todoText, done:false});
-        todoList.todoText = '';
-      };
+App.controller('mainController', function($scope, $modal, $log, $filter) {
+  $scope.sortType     = 'id'; // set the default sort type
+  $scope.sortReverse  = false;  // set the default sort order
+  $scope.searchPerson  = '';     // set the default search/filter term
 
-      todoList.remaining = function() {
-        var count = 0;
-        angular.forEach(todoList.todos, function(todo) {
-          count += todo.done ? 0 : 1;
-        });
-        return count;
-      };
+  // Array - List of People
+  $scope.People = [
+    { text: 'todo 1', deadline: '19/02/2012', done: false, priority: "High"},
+    { text: 'todo 2', deadline: '12/02/2012', done: false, priority: "High"}
+  ];
 
-      todoList.archive = function() {
-        var oldTodos = todoList.todos;
-        todoList.todos = [];
-        angular.forEach(oldTodos, function(todo) {
-          if (!todo.done) todoList.todos.push(todo);
-        });
-      };
-    });</script>
+   $scope.addPerson = function(){
+    var todoItem = {
+        text: $scope.text,
+        deadline: $scope.deadline,
+        done: false,
+        priority: $scope.priority
+    };
+
+    $scope.People.push(todoItem);
+  };
+
+   $scope.removePerson = function(index){
+    $scope.People.splice(index, 1);
+   };
+
+   $scope.getPriorityClass = function (p) {
+     console.log(p);
+     if (p == "Low"){
+       return "green";
+     }
+     else {
+       return "red";
+     }
+   };
+
+  $scope.openPopupScreen = function() {
+
+    var modalInstance = $modal.open({
+      template: '<div class="modal-header">   <a class="close" data-dismiss="modal" ng-click="cancel()">X</a><h1>Add Todo</h1></div><div class="modal-body">    <form >' +
+        ' <label>ToDo:  </label><textarea name="comment" cols="40" rows="3" ng-model="todo.text"></textarea></br>' +
+        ' <label>Deadline:  </label><input type="date" class="span3" ng-model="todo.deadline"></br>' +
+        ' <label>Priority:  </label><select ng-model="todo.priority" ng-options="p for p in priority" data-ng-class="getPriorityClass(p)">{{p}}</select></br>' +
+        ' <button type="button" class="btn btn-success" ng-click="add()">Add In List</button>' +
+        '  <button type="reset" class="btn ">Clear</button>' +
+        ' </form>' +
+        '</div>' +
+        '<div class="modal-footer">' +
+        '  <a data-dismiss="modal" aria-hidden="true" class="btn btn-primary" ng-click="cancel()">close</a>' +
+        '</div>',
+      controller: ModalInstanceCtrl
+    });
+    modalInstance.result.then(function (newPerson) {
+      $scope.People.push(newPerson);
+    });
+
+  };
+
+
+var ModalInstanceCtrl = function($scope, $modalInstance) {
+  $scope.todo = {text: '', deadline: '', priority: ''};
+
+  $scope.ok = function() {
+    $modalInstance.close($scope.selected.item);
+  };
+
+  $scope.cancel = function() {
+    $modalInstance.dismiss('cancel');
+  };
+
+//$scope.priority = [{level: 'High', color: 'red'}, {level: 'Middle', color: 'yellow'}, {level: 'Low', color: 'green'}];
+$scope.priority = ['High','Middle','Low'];
+
+  $scope.add = function() {
+    //Pass newPerson to caller from main controller
+    $modalInstance.close($scope.todo);
+  };
+};
+
+});</script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
 
 </body>
 
