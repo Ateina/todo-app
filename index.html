@@ -5,11 +5,15 @@
   <meta charset="utf-8">
   <style>
   .red{
-    background-color: red;
+    background-color: rgba(255, 0, 0, 0.53);
+  }
+
+  .yellow{
+	background-color: rgba(255, 255, 0, 0.65);
   }
 
   .green{
-    background-color: green;
+    background-color: rgba(43, 189, 14, 0.76);
   }
 </style>
 </head>
@@ -19,7 +23,7 @@
   <h2 style="padding: 20px;">Todos</h2>
   <div ng-controller="mainController as todoList" >
     <ul class="unstyled">
-      <li ng-repeat="todo in People | orderBy: 'deadline'" data-ng-class="getPriorityClass(todo.priority)">
+      <li ng-repeat="todo in People | filter: search.priority" data-ng-class="getPriorityClass(todo.priority)">
         <label class="checkbox">
           <input type="checkbox" ng-model="todo.done">
           <span class="done-{{todo.done}}">{{todo.deadline | date:"dd/MM/yyyy"}}  ==  {{todo.text}}  ==  {{todo.priority}}</span>
@@ -28,8 +32,14 @@
     </ul>
   </br>
     <a class="btn btn-danger fa fa-plus ng-scope" data-toggle="modal" href="" ng-click="openPopupScreen()">Add cool ToDo item</a>
+</br></br>
+    <h4>Filters</h4>
+    <input type="checkbox" data-ng-model='search.priority' data-ng-true-value="'high'" data-ng-false-value='' /> High
+    <input type="checkbox" data-ng-model='search.priority' data-ng-true-value="'middle'" data-ng-false-value='' /> Middle
+    <input type="checkbox" data-ng-model='search.priority' data-ng-true-value="'low'" data-ng-false-value='' /> Low
   </div>
 </div>
+
 
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
   <script data-require="ui-bootstrap@*" data-semver="0.10.0" src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.10.0.js"></script>
@@ -38,13 +48,14 @@ var App = angular.module('todoApp', ['ui.bootstrap'])
 
 App.controller('mainController', function($scope, $modal, $log, $filter) {
   $scope.sortType     = 'id'; // set the default sort type
-  $scope.sortReverse  = false;  // set the default sort order
-  $scope.searchPerson  = '';     // set the default search/filter term
+  $scope.search=[];
 
   // Array - List of People
   $scope.People = [
     { text: 'todo 1', deadline: '19/02/2012', done: false, priority: "High"},
-    { text: 'todo 2', deadline: '12/02/2012', done: false, priority: "High"}
+    { text: 'todo 2', deadline: '12/02/2012', done: false, priority: "Middle"},
+    { text: 'todo 3', deadline: '12/02/2012', done: false, priority: "Low"},
+    { text: 'todo 4', deadline: '12/02/2012', done: false, priority: "Low"}
   ];
 
    $scope.addPerson = function(){
@@ -63,9 +74,11 @@ App.controller('mainController', function($scope, $modal, $log, $filter) {
    };
 
    $scope.getPriorityClass = function (p) {
-     console.log(p);
      if (p == "Low"){
        return "green";
+     }
+     if (p == "Middle"){
+       return "yellow";
      }
      else {
        return "red";
@@ -75,17 +88,25 @@ App.controller('mainController', function($scope, $modal, $log, $filter) {
   $scope.openPopupScreen = function() {
 
     var modalInstance = $modal.open({
-      template: '<div class="modal-header">   <a class="close" data-dismiss="modal" ng-click="cancel()">X</a><h1>Add Todo</h1></div><div class="modal-body">    <form >' +
-        ' <label>ToDo:  </label><textarea name="comment" cols="40" rows="3" ng-model="todo.text"></textarea></br>' +
-        ' <label>Deadline:  </label><input type="date" class="span3" ng-model="todo.deadline"></br>' +
-        ' <label>Priority:  </label><select ng-model="todo.priority" ng-options="p for p in priority" data-ng-class="getPriorityClass(p)">{{p}}</select></br>' +
-        ' <button type="button" class="btn btn-success" ng-click="add()">Add In List</button>' +
-        '  <button type="reset" class="btn ">Clear</button>' +
-        ' </form>' +
-        '</div>' +
-        '<div class="modal-footer">' +
-        '  <a data-dismiss="modal" aria-hidden="true" class="btn btn-primary" ng-click="cancel()">close</a>' +
-        '</div>',
+      template: '<div class="modal-header">' +
+                  '<a class="close" data-dismiss="modal" ng-click="cancel()">X</a>' +
+                  '<h1>Add Todo</h1>' +
+                '</div>' +
+                '<div class="modal-body">' +
+                  '<form >' +
+                  ' <label>ToDo:  </label>' +
+                    '<textarea name="comment" cols="40" rows="3" ng-model="todo.text"></textarea></br>' +
+                  ' <label>Deadline:  </label>' +
+                    '<input type="date" class="span3" ng-model="todo.deadline"></br>' +
+                  ' <label>Priority:  </label>' +
+                    '<select ng-model="todo.priority" ng-options="p for p in priority" data-ng-class="getPriorityClass(p)">{{p}}</select></br>' +
+                  ' <button type="button" class="btn btn-success" ng-click="add()">Add In List</button>' +
+                  ' <button type="reset" class="btn ">Clear</button>' +
+                  '</form>' +
+                '</div>' +
+                '<div class="modal-footer">' +
+                '  <a data-dismiss="modal" aria-hidden="true" class="btn btn-primary" ng-click="cancel()">close</a>' +
+                '</div>',
       controller: ModalInstanceCtrl
     });
     modalInstance.result.then(function (newPerson) {
