@@ -5,13 +5,13 @@
   <meta charset="utf-8">
   <style>
   .red{
-    background-color: rgba(255, 0, 0, 0.53);
+      color: rgb(255, 0, 0);
   }
   .yellow{
-	background-color: rgba(255, 255, 0, 0.65);
+	   color: rgb(255, 255, 0);
   }
   .green{
-    background-color: rgba(43, 189, 14, 0.76);
+    color: rgb(43, 189, 14);
   }
   .done-true {
     text-decoration: line-through;
@@ -35,14 +35,18 @@
     </div>
     <div style="width: 60%;background-color: rgba(250, 235, 215, 0.8);border-radius: 8px;padding: 10px;margin: 10px;float: left;">
     <h2 style="">Todos</h2>
-    <ul class="unstyled">
-      <li ng-repeat="todo in People | filter: search.priority | filter: searchKeyword | orderBy: sort" data-ng-class="getPriorityClass(todo.priority)">
-        <label class="checkbox">
-          <input type="checkbox" ng-model="todo.done">
-          <span class="done-{{todo.done}}">{{todo.deadline | date:"dd/MM/yyyy"}}  ==  {{todo.text}}  ==  {{todo.priority}}</span>
-        </label>
-      </li>
-    </ul>
+    <table class="table table-bordered"style="background-color: cornsilk;">
+      <tr>
+        <th>Deadline</th>
+        <th>ToDo</th>
+        <th>Priority</th>
+     </tr>
+      <tr ng-repeat="todo in People | filter: search.priority | filter: searchKeyword | orderBy: sort">
+        <td>{{todo.text}}</td>
+        <td>{{todo.deadline | date:"dd/MM/yyyy"}}</td>
+        <td  data-ng-class="getPriorityClass(todo.priority)">{{todo.priority}}</td>
+      </tr>
+    </table>
   </br>
     <a class="btn btn-danger fa fa-plus ng-scope" data-toggle="modal" href="" ng-click="openPopupScreen()">Add cool ToDo item</a>
   </div>
