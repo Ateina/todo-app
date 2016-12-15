@@ -4,47 +4,40 @@
 <head>
   <meta charset="utf-8">
   <style>
-  .red{
-      color: rgb(255, 0, 0);
-  }
-  .yellow{
-	   color: rgb(255, 255, 0);
-  }
-  .green{
-    color: rgb(43, 189, 14);
-  }
-  .done-true {
-    text-decoration: line-through;
-    color: grey;
-}
+
 </style>
 </head>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-<body style="padding: 50px;background:url(/images/pic.jpg)">
+<link rel="stylesheet" type="text/css" href="/style.css">
+<body class="body-style">
   <div>
   <div ng-controller="mainController as todoList">
-    <div class="col-md-4" style="background-color: rgba(250, 235, 215, 0.8);border-radius: 8px;padding: 10px;margin: 10px;">
-      <h2 style="">Search</h2>
-      <p><input type="text" ng-model="searchKeyword"></p>
-      <h2 style="">Filters</h2>
-      <input type="checkbox" data-ng-model='search.priority' data-ng-true-value="'high'" data-ng-false-value='' /> High </br>
-      <input type="checkbox" data-ng-model='search.priority' data-ng-true-value="'middle'" data-ng-false-value='' /> Middle <br>
-      <input type="checkbox" data-ng-model='search.priority' data-ng-true-value="'low'" data-ng-false-value='' /> Low </br>
-      <h2 style="">Sort</h2>
-      <input type="checkbox" data-ng-model='sort' data-ng-true-value="'text'" data-ng-false-value='' /> By Text <br>
+    <div class="col-md-4 settings">
+      <h2>Search</h2>
+        <p>
+          <input type="text" ng-model="searchKeyword">
+        </p>
+      <h2>Filters</h2>
+        <input type="checkbox" data-ng-model='search.priority' data-ng-true-value="'high'" data-ng-false-value='' /> High </br>
+        <input type="checkbox" data-ng-model='search.priority' data-ng-true-value="'middle'" data-ng-false-value='' /> Middle <br>
+        <input type="checkbox" data-ng-model='search.priority' data-ng-true-value="'low'" data-ng-false-value='' /> Low </br>
+      <h2>Sort</h2>
+        <input type="checkbox" data-ng-model='sort' data-ng-true-value="'text'" data-ng-false-value='' /> By Text <br>
     </div>
-    <div style="width: 60%;background-color: rgba(250, 235, 215, 0.8);border-radius: 8px;padding: 10px;margin: 10px;float: left;">
-    <h2 style="">Todos</h2>
-    <table class="table table-bordered"style="background-color: cornsilk;">
+    <div class="todoList">
+    <h2>Todos</h2>
+    <table class="table table-bordered" style="background-color: cornsilk;">
       <tr>
-        <th>Deadline</th>
-        <th>ToDo</th>
-        <th>Priority</th>
+        <th class="widht50">ToDo</th>
+        <th class="widht20">Deadline</th>
+        <th class="widht20">Priority</th>
+        <th class="widht10">Delete</th>
      </tr>
-      <tr ng-repeat="todo in People | filter: search.priority | filter: searchKeyword | orderBy: sort">
-        <td>{{todo.text}}</td>
-        <td>{{todo.deadline | date:"dd/MM/yyyy"}}</td>
-        <td  data-ng-class="getPriorityClass(todo.priority)">{{todo.priority}}</td>
+      <tr ng-repeat="todo in todos | filter: search.priority | filter: searchKeyword | orderBy: sort">
+        <td class="widht50">{{todo.text}}</td>
+        <td class="widht20">{{todo.deadline | date:"dd/MM/yyyy"}}</td>
+        <td class="widht20" data-ng-class="getPriorityClass(todo.priority)">{{todo.priority}}</td>
+        <td class="widht10"><span class="fa fa-close" ng-click="deleteToDo($index)"> <img style="width:24px;" src="/images/remove-icon.png"></img></span></td>
       </tr>
     </table>
   </br>
@@ -59,32 +52,26 @@
   <script>
 var App = angular.module('todoApp', ['ui.bootstrap'])
 
-App.controller('mainController', function($scope, $modal, $log, $filter) {
-  $scope.sortType     = 'id'; // set the default sort type
-  $scope.search=[];
-
-  // Array - List of People
-  $scope.People = [
-    { text: 'todo 1', deadline: '19/02/2012', done: false, priority: "High"},
-    { text: 'todo 2', deadline: '12/02/2012', done: false, priority: "Middle"},
-    { text: 'todo 3', deadline: '15/02/2012', done: false, priority: "Low"},
-    { text: 'todo 4', deadline: '12/02/2012', done: false, priority: "Low"},
-    { text: 'todo 5', deadline: '12/02/2017', done: false, priority: "Low"}
+App.controller('mainController', function($scope, $modal) {
+  $scope.todos = [
+    { text: 'todo 1', deadline: '19/02/2012', priority: "High"},
+    { text: 'todo 2', deadline: '12/02/2012', priority: "Middle"},
+    { text: 'todo 3', deadline: '15/02/2012', priority: "Low"},
+    { text: 'todo 4', deadline: '12/02/2012', priority: "Low"},
+    { text: 'todo 5', deadline: '12/02/2017', priority: "Low"}
   ];
 
-   $scope.addPerson = function(){
+   $scope.addToDo = function(){
     var todoItem = {
         text: $scope.text,
         deadline: $scope.deadline,
-        done: false,
         priority: $scope.priority
     };
-
-    $scope.People.push(todoItem);
+    $scope.todos.push(todoItem);
   };
 
-   $scope.removePerson = function(index){
-    $scope.People.splice(index, 1);
+   $scope.deleteToDo = function(index){
+    $scope.todos.splice(index, 1);
    };
 
    $scope.getPriorityClass = function (p) {
@@ -100,7 +87,6 @@ App.controller('mainController', function($scope, $modal, $log, $filter) {
    };
 
   $scope.openPopupScreen = function() {
-
     var modalInstance = $modal.open({
       template: '<div class="modal-header">' +
                   '<a class="close" data-dismiss="modal" ng-click="cancel()">X</a>' +
@@ -123,12 +109,10 @@ App.controller('mainController', function($scope, $modal, $log, $filter) {
                 '</div>',
       controller: ModalInstanceCtrl
     });
-    modalInstance.result.then(function (newPerson) {
-      $scope.People.push(newPerson);
+    modalInstance.result.then(function (newToDo) {
+      $scope.todos.push(newToDo);
     });
-
   };
-
 
 var ModalInstanceCtrl = function($scope, $modalInstance) {
   $scope.todo = {text: '', deadline: '', priority: ''};
@@ -145,15 +129,11 @@ var ModalInstanceCtrl = function($scope, $modalInstance) {
 $scope.priority = ['High','Middle','Low'];
 
   $scope.add = function() {
-    //Pass newPerson to caller from main controller
     $modalInstance.close($scope.todo);
   };
 };
-
 });</script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
-
 </body>
-
 </html>

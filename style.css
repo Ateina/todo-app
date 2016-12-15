@@ -1,0 +1,40 @@
+.red{
+    color: rgb(255, 0, 0);
+}
+.yellow{
+   color: rgb(181, 137, 53);
+}
+.green{
+  color: rgb(43, 189, 14);
+}
+.done-true {
+  text-decoration: line-through;
+  color: grey;
+}
+.body-style{
+  padding: 50px;
+  background: url(/images/pic.jpg);
+}
+.settings{
+  background-color: rgba(250, 235, 215, 0.8);
+  border-radius: 8px;
+  padding: 10px;
+  margin: 10px;
+}
+.todoList{
+  width: 60%;
+  background-color: rgba(250, 235, 215, 0.8);
+  border-radius: 8px;
+  padding: 10px;
+  margin: 10px;
+  float: left;
+}
+.widht50{
+  width: 50%;
+}
+.widht20{
+  width: 20%;
+}
+.widht10{
+  width: 10%;
+}
